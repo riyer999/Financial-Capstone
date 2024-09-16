@@ -5,9 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="62d909cd-e7ac-4b0e-a8d1-c43a92434829" name="Changes" comment="Test commit for the project">
-      <change afterPath="$PROJECT_DIR$/Visualization of Company Financials/Coca_Cola_Income_Statement.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Visualization of Company Financials/readPickle.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Visualization of Company Financials/make_allData.py" beforeDir="false" afterPath="$PROJECT_DIR$/Visualization of Company Financials/make_allData.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Visualization of Company Financials/Using_Github.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Visualization of Company Financials/readPickle.py" beforeDir="false" afterPath="$PROJECT_DIR$/Visualization of Company Financials/readPickle.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,44 +46,44 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.1c and 2c.executor": "Run",
-    "Python.2c and 3c.executor": "Run",
-    "Python.3c and 4c.executor": "Run",
-    "Python.Coca_Cola_Income_Statement.executor": "Run",
-    "Python.Email practice.executor": "Run",
-    "Python.Making Pairs 1c and 2c.executor": "Run",
-    "Python.Making Pairs 1c and 3c.executor": "Run",
-    "Python.Making Pairs 1c and 4c.executor": "Run",
-    "Python.Making Pairs 2c and 3c.executor": "Run",
-    "Python.Making Pairs 2c and 4c.executor": "Run",
-    "Python.Making Pairs 3c and 4c.executor": "Run",
-    "Python.make_allData.executor": "Run",
-    "Python.matches document.executor": "Run",
-    "Python.mentorship pairing and email.executor": "Run",
-    "Python.practice with all names.executor": "Run",
-    "Python.readPickle.executor": "Run",
-    "Python.requests.executor": "Run",
-    "Python.scratch.executor": "Run",
-    "Python.test.executor": "Run",
-    "Python.testttt.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Users/RIyer/PycharmProjects/pythonProject/Visualization of Company Financials",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.1c and 2c.executor&quot;: &quot;Run&quot;,
+    &quot;Python.2c and 3c.executor&quot;: &quot;Run&quot;,
+    &quot;Python.3c and 4c.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Coca_Cola_Income_Statement.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Email practice.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Making Pairs 1c and 2c.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Making Pairs 1c and 3c.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Making Pairs 1c and 4c.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Making Pairs 2c and 3c.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Making Pairs 2c and 4c.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Making Pairs 3c and 4c.executor&quot;: &quot;Run&quot;,
+    &quot;Python.make_allData.executor&quot;: &quot;Run&quot;,
+    &quot;Python.matches document.executor&quot;: &quot;Run&quot;,
+    &quot;Python.mentorship pairing and email.executor&quot;: &quot;Run&quot;,
+    &quot;Python.practice with all names.executor&quot;: &quot;Run&quot;,
+    &quot;Python.readPickle.executor&quot;: &quot;Run&quot;,
+    &quot;Python.requests.executor&quot;: &quot;Run&quot;,
+    &quot;Python.scratch.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.testttt.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/RIyer/PycharmProjects/pythonProject/Visualization of Company Financials&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "Python"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;Python&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\RIyer\PycharmProjects\pythonProject\Visualization of Company Financials" />
@@ -126,6 +126,8 @@
       <workItem from="1725577378253" duration="1845000" />
       <workItem from="1726094482376" duration="5368000" />
       <workItem from="1726231886254" duration="352000" />
+      <workItem from="1726491299676" duration="107000" />
+      <workItem from="1726506673994" duration="800000" />
     </task>
     <task id="LOCAL-00001" summary="Test commit for the project">
       <option name="closed" value="true" />
@@ -159,9 +161,9 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/pythonProject$3c_and_4c.coverage" NAME="3c and 4c Coverage Results" MODIFIED="1723392969023" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/.venv/Scripts/Echo Mentorship Scripts/3c and 4c mentorship pairings" />
     <SUITE FILE_PATH="coverage/pythonProject$Making_Pairs_1c_and_3c.coverage" NAME="Making Pairs 1c and 3c Coverage Results" MODIFIED="1723649171357" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/.venv/Scripts/Echo Mentorship Scripts/1c and 3c mentorship pairings" />
-    <SUITE FILE_PATH="coverage/pythonProject$make_allData.coverage" NAME="make_allData Coverage Results" MODIFIED="1726252105214" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Visualization of Company Financials" />
+    <SUITE FILE_PATH="coverage/pythonProject$make_allData.coverage" NAME="make_allData Coverage Results" MODIFIED="1726274628083" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Visualization of Company Financials" />
     <SUITE FILE_PATH="coverage/pythonProject$Making_Pairs_1c_and_4c.coverage" NAME="Making Pairs 1c and 4c Coverage Results" MODIFIED="1723650406793" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/.venv/Scripts/Echo Mentorship Scripts/1c and 4c mentorship pairings" />
-    <SUITE FILE_PATH="coverage/pythonProject$readPickle.coverage" NAME="readPickle Coverage Results" MODIFIED="1726252121559" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Visualization of Company Financials" />
+    <SUITE FILE_PATH="coverage/pythonProject$readPickle.coverage" NAME="readPickle Coverage Results" MODIFIED="1726274633711" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Visualization of Company Financials" />
     <SUITE FILE_PATH="coverage/pythonProject$Making_Pairs_2c_and_4c.coverage" NAME="Making Pairs 2c and 4c Coverage Results" MODIFIED="1723661716594" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/.venv/Scripts/Echo Mentorship Scripts/2c and 4c mentorship pairings" />
     <SUITE FILE_PATH="coverage/pythonProject$2c_and_3c.coverage" NAME="2c and 3c Coverage Results" MODIFIED="1723651067032" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/.venv/Scripts/Echo Mentorship Scripts/2c and 3c mentorship pairings" />
     <SUITE FILE_PATH="coverage/pythonProject$requests.coverage" NAME="requests Coverage Results" MODIFIED="1726180109161" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/.venv/Scripts/Capstone" />
