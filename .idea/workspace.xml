@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="62d909cd-e7ac-4b0e-a8d1-c43a92434829" name="Changes" comment="Test commit for the project">
-      <change afterPath="$PROJECT_DIR$/Visualization of Company Financials/Using_Github.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Visualization of Company Financials/readPickle.py" beforeDir="false" afterPath="$PROJECT_DIR$/Visualization of Company Financials/readPickle.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Visualization of Company Financials/Using_Github.md" beforeDir="false" afterPath="$PROJECT_DIR$/Visualization of Company Financials/Using_Github.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -127,7 +125,7 @@
       <workItem from="1726094482376" duration="5368000" />
       <workItem from="1726231886254" duration="352000" />
       <workItem from="1726491299676" duration="107000" />
-      <workItem from="1726506673994" duration="800000" />
+      <workItem from="1726506673994" duration="1215000" />
     </task>
     <task id="LOCAL-00001" summary="Test commit for the project">
       <option name="closed" value="true" />
