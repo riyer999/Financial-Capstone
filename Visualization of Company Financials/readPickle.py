@@ -6,3 +6,5 @@ with open('allData.pkl', 'rb') as file:
 
 # Example: Print data for coca cola
 print(allData['KO'])
+# gillian 
+print ('Hello')
