@@ -5,10 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="62d909cd-e7ac-4b0e-a8d1-c43a92434829" name="Changes" comment="Test commit for the project">
-      <change afterPath="$PROJECT_DIR$/.idea/pythonProject.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Visualization of Company Financials/scraping_sec.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Visualization of Company Financials/renaming.ipynb" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -141,7 +138,7 @@
       <workItem from="1726747633402" duration="1427000" />
       <workItem from="1726789521105" duration="5022000" />
       <workItem from="1726952220778" duration="4449000" />
-      <workItem from="1727052420126" duration="2390000" />
+      <workItem from="1727052420126" duration="3456000" />
     </task>
     <task id="LOCAL-00001" summary="Test commit for the project">
       <option name="closed" value="true" />
