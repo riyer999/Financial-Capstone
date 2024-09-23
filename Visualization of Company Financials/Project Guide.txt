@@ -1,0 +1,14 @@
+file organization
+-Visualization of Company Financials
+    -backend
+        -0_tickerList.txt (has the ticker list for all the companies)
+        -allData.pkl (output of the make_allData.py file this is read in by the app.py file)
+        -make_allData.py (responsible for collecting the income statement information)
+        -readPickle.py (file that can read the output of the make_allData.py file)
+    -frontend
+        -templates
+            -index.html (once the flask server is started by running "app.py" in your terminal go to a browser (localhost:5000) to look at the output of this file.
+    app.y (defines the flask web application that serves a home page and provides an API to fetch the income statement data from the stock ticker)
+
+
+Be careful with restructuring file paths because files are reading each other through paths.
