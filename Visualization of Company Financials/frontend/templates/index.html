@@ -1,9 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Data Visualization</title>
+<!DOCTYPE html> <! –– declares the document as a HTML5 file––>
+<html lang="en"> <! –– language set to english ––>
+<head> <! ––  metadata about the document, including the character set and the page's title––>
+    <meta charset="UTF-8"> <! –– supporting all characters ––>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <! –– makes the web responsive on all devices setting the width to the device's width ––>
+    <title>Financial Data Visualization</title> <! –– setting the title of the webpage ––>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -29,6 +29,7 @@
     <input type="text" id="ticker" placeholder="Enter Ticker (e.g., AAPL)">
     <button id="fetchButton">Fetch Data</button>
     <div id="result"></div>
+    <img id="plot" style="display:none;" />
 
     <script>
         document.getElementById('fetchButton').addEventListener('click', function() {
@@ -36,13 +37,17 @@
 
             fetch(`/data/${ticker}`)
                 .then(response => {
-                    // Since we are returning plain text, we just read it as text
-                    return response.text();
+                    if (response.ok) {
+                        return response.blob();  // Get the image blob
+                    } else {
+                        return response.text().then(text => { throw new Error(text); });
+                    }
                 })
-                .then(data => {
-                    // Display the result in the result div
-                    document.getElementById('result').innerHTML = `<p>${data}</p>`;
-                    document.getElementById('result').style.display = 'block'; // Show result div
+                .then(imageBlob => {
+                    const imgElement = document.getElementById('plot');
+                    imgElement.src = URL.createObjectURL(imageBlob); // Create a URL for the image blob
+                    imgElement.style.display = 'block'; // Show the image
+                    document.getElementById('result').innerHTML = ''; // Clear previous results
                 })
                 .catch(error => {
                     document.getElementById('result').innerHTML = `<p>Error fetching data: ${error.message}</p>`;

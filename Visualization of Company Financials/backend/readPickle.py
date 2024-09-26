@@ -1,4 +1,5 @@
 import pickle
+#this file isn't doing anything in the program right now.
 
 # Load the data from the allData.pkl file
 with open('allData.pkl', 'rb') as file:
