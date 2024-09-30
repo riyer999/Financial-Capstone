@@ -6,7 +6,7 @@ with open('allData.pkl', 'rb') as file:
     allData = pickle.load(file)
 
 # Example: Accessing data for a specific ticker (e.g., 'AAPL')
-ticker = 'AMZN'
+ticker = 'KO'
 
 # Access income statement
 income_statement = allData[ticker]['income_statement']

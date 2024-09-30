@@ -20,7 +20,7 @@ for ticker in tickerList:
         temp['income_statement']=ystock.incomestmt
         temp['cashflow_statement']=ystock.cashflow
         temp['info']=ystock.info #this gets information like the market cap and other stuff
-        temp['hist']=ystock.history(period='5y') #fetches the historical stocck price for the last 5 years
+        temp['hist']=ystock.history(period='max') #fetches the historical stocck price for the last 5 years
         #Ticker, temp dict pair added to master dictionary
         allData[ticker] = temp
     except Exception as e: #error case

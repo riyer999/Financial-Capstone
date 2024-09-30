@@ -19,7 +19,13 @@ if ticker in allData:
 
     # Extract Total Revenue and Total Expenses (e.g., Operating Expense)
     total_revenue = income_statement.loc['Total Revenue']
-    total_expenses = income_statement.loc['Operating Expense']
+    #left side of the scale
+    gross_profit = income_statement.loc['Gross Profit']
+    print(gross_profit)
+    cost_of_revenue = total_revenue - gross_profit
+    operating_expense = income_statement.loc['Operating Expense']
+    interest_expense = income_statement.loc['Interest Expense']
+    total_expenses = operating_expense + cost_of_revenue + interest_expense
 
 else:
     raise ValueError(f"Ticker {ticker} not found in the data.")
