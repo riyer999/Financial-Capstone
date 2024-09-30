@@ -23,20 +23,31 @@ def home(): #logic that runs when the home route is accessed
 def index():
     return render_template('index.html')
 
+# Route for the homePage.html page
+@app.route('/homePage')
+def homePage():
+    return render_template('homePage.html')
 
-@app.route('/data/<ticker>')
-def get_data(ticker):
-    if ticker in allData:
-        income_statement = allData[ticker]['income_statement']
+#route for about us
+@app.route('/about')
+def aboutUsPage():
+    return render_template('aboutUsPage.html')
 
-        if 'Operating Expense' in income_statement.index:
-            try:
-                operating_expenses = income_statement.loc['Operating Expense']
-                cleaned_expenses = operating_expenses[operating_expenses != 0].dropna()
-                expenses_list = cleaned_expenses.values.tolist()
+
+
+@app.route('/data/<ticker>') #defining a route for a web application. the /data/ticker is the url for the localhost, the ticker can be replaced with only tickers in the make_allData file
+def get_data(ticker): #takes ticker as an argument. the value of the ticker will be passed to the url
+    if ticker in allData: #is the ticker in the allData library??
+        income_statement = allData[ticker]['income_statement'] #we just want income statement stuffs right now
+
+        if 'Operating Expense' in income_statement.index: #check the operating expenses entry present in the income statement
+            try: #catch potential errors
+                operating_expenses = income_statement.loc['Operating Expense'] # extractes the operating expenses from the income statement
+                cleaned_expenses = operating_expenses[operating_expenses != 0].dropna() #cleans the operating expenses by removing any entires that are zero and dropping the nan values
+                expenses_list = cleaned_expenses.values.tolist() #was getting a problem with zeroes being displayed
                 dates = cleaned_expenses.index.astype(str).tolist()
 
-                plt.figure(figsize=(10, 5))
+                plt.figure(figsize=(10, 5)) #actual plotting part
                 plt.bar(dates, expenses_list, color='blue', width=0.4)
                 plt.title(f'Operating Expenses for {ticker}')
                 plt.xlabel('Dates')
@@ -44,10 +55,10 @@ def get_data(ticker):
                 plt.xticks(rotation=45)
                 plt.tight_layout()
 
-                with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmpfile:
-                    plt.savefig(tmpfile.name)
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmpfile: #creating a temporary file to save the generated image.
+                    plt.savefig(tmpfile.name) #saves the current figure to a temp file created in the prevous line
                     plt.close()  # Clear the figure to free up memory
-                    return send_file(tmpfile.name, mimetype='image/png')
+                    return send_file(tmpfile.name, mimetype='image/png') #Sends the image back to the client
             except Exception as e:
                 return f'Error generating plot: {str(e)}', 500
         else:
@@ -57,3 +68,5 @@ def get_data(ticker):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
