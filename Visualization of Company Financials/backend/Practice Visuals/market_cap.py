@@ -11,14 +11,17 @@ ticker = 'KO'
 # Step 2: Get financial data for the selected ticker
 if ticker in allData:
     balance_sheet = allData[ticker]['balance_sheet']
+    income_sheet = allData[ticker]['income_sheet']
     # Extract Shares Outstanding (typically in the Equity section, labeled as 'Common Stock' or similar)
-    shares_outstanding = balance_sheet.loc['Ordinary Shares Number', :].values[0]  # Adjust if labeled differently
+    shares_outstanding = balance_sheet.loc['Ordinary Shares Number', 2022] # Adjust if labeled differently
+
+    cost_of_revenue = income_sheet.loc['Cost of Revenue']
 else:
     raise ValueError(f"Ticker {ticker} not found in the data.")
 
 
 print(shares_outstanding)
-
+print(cost_of_revenue)
 
 # Step 3: Get the current stock price using yfinance
 stock_data = yf.Ticker(ticker)

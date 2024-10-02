@@ -30,6 +30,12 @@ if ticker in allData:
 else:
     raise ValueError(f"Ticker {ticker} not found in the data.")
 
+print(total_revenue)
+print("total expenses", total_expenses)
+
+
+
+
 # Step 3: Get the current stock price using yfinance
 stock_data = yf.Ticker(ticker)
 share_price = stock_data.history(period='1d')['Close'][0]  # Get the latest closing price
