@@ -8,5 +8,6 @@ with open('../allData.pkl', 'rb') as file:
     allData = pickle.load(file)
 income_statement = allData[ticker]['income_statement']
 
-total_revenue = income_statement.loc['Total Revenue', year]
+total_revenue = income_statement.loc['Cost Of Revenue', year]
 print(total_revenue)
+print(income_statement)

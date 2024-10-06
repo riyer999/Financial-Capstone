@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle
 import pandas as pd
-import yfinance as yf  # Ensure you have yfinance installed
+import yfinance as yf
 
 # Load financial data and define total_revenue
 def load_data(ticker, year):
@@ -13,8 +13,7 @@ def load_data(ticker, year):
 
     # Get the total revenue for the specific year
     total_revenue = income_statement.loc['Total Revenue', year]
-    gross_profit = income_statement.loc['Gross Profit', year]
-    cost_of_revenue = total_revenue - gross_profit
+    cost_of_revenue = income_statement.loc['Cost Of Revenue', year]
     operating_expense = income_statement.loc['Operating Expense', year]
     interest_expense = income_statement.loc['Interest Expense', year]
     total_expenses = operating_expense + cost_of_revenue + interest_expense
@@ -33,16 +32,16 @@ def load_data(ticker, year):
 
     # Ensure total_revenue is a single scalar value, not a pandas Series
     if isinstance(total_revenue, pd.Series):
-        total_revenue = total_revenue.iloc[0]  # or use .item() if it works for your data
+        total_revenue = total_revenue.iloc[0]
 
     if isinstance(total_expenses, pd.Series):
         total_expenses = total_expenses.iloc[0]
 
-    return total_revenue, total_expenses, market_cap
+    return total_revenue, total_expenses, market_cap #function will return values for desired company
 
 # Define the company ticker and year
-ticker = 'KO'  # Replace 'KO' with the ticker you want
-year = '2022'  # Replace with the specific year you want
+ticker = 'KO'
+year = '2022'
 
 # Get total revenue, expenses, and market cap from data
 total_revenue, total_expenses, market_cap = load_data(ticker, year)
@@ -58,13 +57,14 @@ def draw_scale(revenue, expenses, market_cap):
     beam_length = 12
     support_height = 6
 
+
     # Revenue and Expense scaling factor (to adjust size differences)
     max_weight = max(revenue, expenses)  # Ensure both revenue and expenses are single values
-    revenue_scale = revenue / max_weight
+    revenue_scale = revenue / max_weight #scaling the values to ensure they fit properly in the visualization
     expense_scale = expenses / max_weight
 
-    # Create a figure and axis
-    fig, ax = plt.subplots(figsize=(10, 6))
+    # sets the size of the overall plot
+    fig, ax = plt.subplots(figsize=(20, 12))
 
     # Draw the base of the scale
     ax.plot([-base_width / 2, base_width / 2], [0, 0], color='brown', lw=4)
