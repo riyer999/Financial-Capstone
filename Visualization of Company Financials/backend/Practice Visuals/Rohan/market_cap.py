@@ -2,7 +2,7 @@ import yfinance as yf
 import pickle
 
 # Step 1: Load financial data (including balance sheet) from pickle file
-with open('../allData.pkl', 'rb') as file:
+with open('../../allData.pkl', 'rb') as file:
     allData = pickle.load(file)
 
 # Select the company ticker (e.g., 'KO')

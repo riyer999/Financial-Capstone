@@ -3,7 +3,7 @@ import pickle
 import matplotlib.pyplot as plt
 
 # Step 1: Load financial data (including balance sheet and income statement) from pickle file
-with open('../allData.pkl', 'rb') as file:
+with open('../../allData.pkl', 'rb') as file:
     allData = pickle.load(file)
 
 # Select the company ticker (e.g., 'KO')

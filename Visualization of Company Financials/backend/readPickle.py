@@ -6,7 +6,7 @@ with open('allData.pkl', 'rb') as file:
     allData = pickle.load(file)
 
 # Example: Accessing data for a specific ticker (e.g., 'AAPL')
-ticker = 'KO'
+ticker = 'AAPL'
 
 # Access income statement
 income_statement = allData[ticker]['income_statement']
@@ -16,9 +16,8 @@ income_statement = allData[ticker]['income_statement']
 cashflow_statement = allData[ticker]['cashflow_statement']
 #print("Cash Flow Statement:\n", cashflow_statement)
 gross_profit = income_statement.loc['Gross Profit']
-print(gross_profit)
-
-
+total_revenue = income_statement.loc['Total Revenue']
+print(total_revenue)
 # Access company info
 info = allData[ticker]['info']
 #print("Company Info:\n", info)
@@ -29,5 +28,7 @@ balance_sheet = allData[ticker]['balance_sheet']
 
 # Access historical data
 history = allData[ticker]['hist']
-print(income_statement)
+
 #print("Historical Data (5 years):\n", history)
+print(income_statement)
+
