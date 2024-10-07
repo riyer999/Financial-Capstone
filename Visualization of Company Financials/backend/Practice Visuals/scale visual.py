@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle
 import pandas as pd
-import yfinance as yf
+import yfinance as yf  # need all these libraries to run the program
 
 # Load financial data and define total_revenue
 def load_data(ticker, year):
@@ -12,11 +12,14 @@ def load_data(ticker, year):
     balance_sheet = allData[ticker]['balance_sheet']
 
     # Get the total revenue for the specific year
-    total_revenue = income_statement.loc['Total Revenue', year]
-    cost_of_revenue = income_statement.loc['Cost Of Revenue', year]
-    operating_expense = income_statement.loc['Operating Expense', year]
-    interest_expense = income_statement.loc['Interest Expense', year]
-    total_expenses = operating_expense + cost_of_revenue + interest_expense
+    total_revenue = income_statement.loc['Total Revenue', year].item()  # Convert to scalar
+
+    # Retrieve individual expenses
+    gross_profit = income_statement.loc['Gross Profit', year].item()  # Convert to scalar
+    cost_of_revenue = total_revenue - gross_profit
+    operating_expense = income_statement.loc['Operating Expense', year].item()  # Convert to scalar
+    interest_expense = income_statement.loc['Interest Expense', year].item()  # Convert to scalar
+    total_expenses = cost_of_revenue + operating_expense + interest_expense
 
     # Retrieve shares outstanding
     shares_outstanding = balance_sheet.loc['Ordinary Shares Number', year]
@@ -27,44 +30,38 @@ def load_data(ticker, year):
     stock_data = yf.Ticker(ticker)
     share_price = stock_data.history(period='1d')['Close'].iloc[0]  # Get the latest closing price
 
-    # Step 4: Calculate Market Cap
+    # Calculate Market Cap
     market_cap = share_price * shares_outstanding  # Ensure both are numeric
 
-    # Ensure total_revenue is a single scalar value, not a pandas Series
-    if isinstance(total_revenue, pd.Series):
-        total_revenue = total_revenue.iloc[0]
-
-    if isinstance(total_expenses, pd.Series):
-        total_expenses = total_expenses.iloc[0]
-
-    return total_revenue, total_expenses, market_cap #function will return values for desired company
+    return total_revenue, cost_of_revenue, operating_expense, interest_expense, market_cap
 
 # Define the company ticker and year
-ticker = 'KO'
-year = '2022'
+ticker = 'AAPL'  # Replace 'KO' with the ticker you want
+year = '2022'  # Replace with the specific year you want
 
-# Get total revenue, expenses, and market cap from data
-total_revenue, total_expenses, market_cap = load_data(ticker, year)
+# returning the financial data
+total_revenue, cost_of_revenue, operating_expense, interest_expense, market_cap = load_data(ticker, year)
 
-# Example values
-revenue = total_revenue
-expenses = total_expenses
-
-def draw_scale(revenue, expenses, market_cap):
+def draw_scale(revenue, cost_of_revenue, operating_expense, interest_expense, market_cap): #responsible for drawing a visual scale and comparing revenue and expenses
     # Scale position variables
-    base_width = 10
+    base_width = 6 # sets the width of the red base
     base_height = 1
     beam_length = 12
-    support_height = 6
+    support_height = 3
 
+    # Total expenses
+    total_expenses = cost_of_revenue + operating_expense + interest_expense
 
-    # Revenue and Expense scaling factor (to adjust size differences)
-    max_weight = max(revenue, expenses)  # Ensure both revenue and expenses are single values
-    revenue_scale = revenue / max_weight #scaling the values to ensure they fit properly in the visualization
-    expense_scale = expenses / max_weight
+    # Scaling factors for expenses
+    max_expense = max(total_expenses, revenue)  # Ensure both total_expenses and revenue are single values
+    revenue_scale = revenue / max_expense #scaling all the values relative to each other
+    total_expense_scale = total_expenses / max_expense #get that by dividing each by the max value
+    cost_of_revenue_scale = cost_of_revenue / max_expense
+    operating_expense_scale = operating_expense / max_expense
+    interest_expense_scale = interest_expense / max_expense
 
-    # sets the size of the overall plot
-    fig, ax = plt.subplots(figsize=(20, 12))
+    # Set the size of the overall plot
+    fig, ax = plt.subplots(figsize=(25, 15)) #size of the screen 25 * 15 units
 
     # Draw the base of the scale
     ax.plot([-base_width / 2, base_width / 2], [0, 0], color='brown', lw=4)
@@ -80,18 +77,55 @@ def draw_scale(revenue, expenses, market_cap):
     ax.plot([left_plate_x, left_plate_x], [support_height, support_height - 2 * revenue_scale], color='blue', lw=4)
     ax.text(left_plate_x, support_height - 2.5 * revenue_scale, f"Revenue: {revenue}", ha='center', color='blue')
 
-    # Draw the right plate (expenses side)
+    # Draw the blocks for total expenses on the right side
     right_plate_x = beam_length / 2
-    ax.plot([right_plate_x, right_plate_x], [support_height, support_height - 2 * expense_scale], color='red', lw=4)
-    ax.text(right_plate_x, support_height - 2.5 * expense_scale, f"Expenses: {expenses}", ha='center', color='red')
+    ax.plot([right_plate_x, right_plate_x], [support_height, support_height - 2 * total_expense_scale], color='red', lw=4)
+    ax.text(right_plate_x, support_height - 2.5 * total_expense_scale, f"Total Expenses: {total_expenses}", ha='center',
+            color='red')
 
-    # Adjust the tilt of the scale based on revenue vs. expenses
-    if revenue > expenses:
-        tilt_angle = np.deg2rad(10)
-    elif expenses > revenue:
-        tilt_angle = np.deg2rad(-10)
-    else:
-        tilt_angle = 0
+
+    # Draw individual expense blocks stacked on the right side
+    # Set new x position for the stacked blocks
+    stack_x_position = right_plate_x + -1.5  # Adjust this for left/right positioning
+
+    # Cumulative height for the stacked expenses
+    current_height = support_height + 2.5  # Start at the support height
+
+    # Cost of Revenue Block
+    current_height -= 2 * cost_of_revenue_scale  # Move down for the cost of revenue
+    ax.add_patch(plt.Rectangle((stack_x_position, current_height), 1, 2 * cost_of_revenue_scale, color='orange'))
+    ax.text(stack_x_position + 0.5, current_height + cost_of_revenue_scale, f"Cost of Revenue: {cost_of_revenue}",
+            ha='center', color='black')
+
+    # Operating Expense Block
+    current_height -= 2 * operating_expense_scale  # Move down for the operating expense
+    ax.add_patch(plt.Rectangle((stack_x_position, current_height), 1, 2 * operating_expense_scale, color='purple'))
+    ax.text(stack_x_position + 0.5, current_height + operating_expense_scale, f"Operating Expense: {operating_expense}",
+            ha='center', color='black')
+
+    # Interest Expense Block
+    current_height -= 2 * interest_expense_scale  # Move down for the interest expense
+    ax.add_patch(plt.Rectangle((stack_x_position, current_height), 1, 2 * interest_expense_scale, color='green'))
+    ax.text(stack_x_position + 0.5, current_height + interest_expense_scale, f"Interest Expense: {interest_expense}",
+            ha='center', color='black')
+    # Draw the Total Revenue as a stacked block on the left side
+    total_revenue_x_position = left_plate_x - 1.0  # Positioning the Total Revenue block
+    current_revenue_height = support_height + 1  # Start at the support height for stacking
+
+    # Total Revenue Block
+    current_revenue_height -= 2 * revenue_scale  # Move down for the total revenue
+    ax.add_patch(plt.Rectangle((total_revenue_x_position, current_revenue_height), 1, 2 * revenue_scale, color='blue'))
+    ax.text(total_revenue_x_position + 0.5, current_revenue_height + revenue_scale, f"Total Revenue: {revenue}",
+            ha='center', color='black')
+
+    # Adjust the tilt of the scale based on revenue vs. total expenses, proportionally
+    max_tilt_angle_deg = 20  # Maximum possible tilt in degrees
+    difference = revenue - total_expenses  # Positive if revenue > expenses, negative otherwise
+    max_value = max(revenue, total_expenses)  # Normalize by the larger value
+
+    # Proportional tilt: the larger the difference, the more tilt, capped at max_tilt_angle_deg
+    tilt_angle_deg = (difference / max_value) * max_tilt_angle_deg
+    tilt_angle = np.deg2rad(tilt_angle_deg)  # Convert to radians for the tilt
 
     # Apply the tilt (rotating the beam of the scale)
     for line in ax.lines[-3:]:
@@ -100,10 +134,12 @@ def draw_scale(revenue, expenses, market_cap):
         y_tilted = x_data * np.sin(tilt_angle) + y_data * np.cos(tilt_angle)
         line.set_data(x_tilted, y_tilted)
 
-    # Set plot limits and title
+    # Set plot limits
     ax.set_xlim(-10, 10)
-    ax.set_ylim(-3, 7)
-    ax.set_title("Company Performance: Revenue vs. Expenses")
+    ax.set_ylim(-5, 7)
+
+    # Add the title at the bottom
+    ax.text(0, -3, "Company Performance: Revenue vs. Expenses", ha='center', fontsize=16, fontweight='bold')
 
     # Hide axes
     ax.axis('off')
@@ -115,8 +151,14 @@ def draw_scale(revenue, expenses, market_cap):
     # Show the plot
     plt.show()
 
-# Call the draw_scale function with the actual revenue, expenses, and market cap
-draw_scale(revenue, expenses, market_cap)
+
+# Call the draw_scale function with the actual revenue, individual expenses, and market cap
+draw_scale(total_revenue, cost_of_revenue, operating_expense, interest_expense, market_cap)
+
+# Print financial metrics
 print(f"Total Revenue: ${total_revenue:,.2f}")
-print(f"Total Expenses: ${total_expenses:,.2f}")
+print(f"Cost of Revenue: ${cost_of_revenue:,.2f}")
+print(f"Operating Expenses: ${operating_expense:,.2f}")
+print(f"Interest Expenses: ${interest_expense:,.2f}")
+print(f"Total Expenses: ${cost_of_revenue + operating_expense + interest_expense:,.2f}")
 print(f"Market Cap: ${market_cap:,.2f}")

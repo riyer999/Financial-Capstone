@@ -29,4 +29,5 @@ balance_sheet = allData[ticker]['balance_sheet']
 
 # Access historical data
 history = allData[ticker]['hist']
+print(income_statement)
 #print("Historical Data (5 years):\n", history)
