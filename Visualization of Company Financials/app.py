@@ -1,46 +1,56 @@
-from flask import Flask, render_template, request, send_from_directory
+from flask import Flask, render_template, send_file, jsonify
+import pickle
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+from matplotlib.animation import FFMpegWriter
+
 import numpy as np
-import pickle
 import pandas as pd
+import tempfile
 import yfinance as yf
 import os
 
+matplotlib.use('Agg')
+
 app = Flask(__name__, template_folder='frontend/templates')
 
-
+# Load data from the pickle file
+try:
+    with open('allData.pkl', 'rb') as file:
+        allData = pickle.load(file)
+except Exception as e:
+    print(f"Error loading data: {e}")
+    allData = {}
 
 def get_average_share_price(ticker, year):
     start_date = f"{year}-01-01"
     end_date = f"{year}-12-31"
     stock_data = yf.Ticker(ticker)
     historical_data = stock_data.history(start=start_date, end=end_date)
-    average_price = historical_data['Close'].mean()
-    return average_price
-
+    return historical_data['Close'].mean()
 
 def load_data(ticker, year):
-    with open('allData.pkl', 'rb') as file:
-        allData = pickle.load(file)
+    try:
+        income_statement = allData[ticker]['income_statement']
+        balance_sheet = allData[ticker]['balance_sheet']
 
-    income_statement = allData[ticker]['income_statement']
-    balance_sheet = allData[ticker]['balance_sheet']
+        total_revenue = income_statement.loc['Total Revenue', year].item()
+        gross_profit = income_statement.loc['Gross Profit', year].item()
+        cost_of_revenue = total_revenue - gross_profit
+        operating_expense = income_statement.loc['Operating Expense', year].item()
+        interest_expense = income_statement.loc['Interest Expense', year].item()
+        shares_outstanding = balance_sheet.loc['Ordinary Shares Number', year]
 
-    total_revenue = income_statement.loc['Total Revenue', year].item()
-    gross_profit = income_statement.loc['Gross Profit', year].item()
-    cost_of_revenue = total_revenue - gross_profit
-    operating_expense = income_statement.loc['Operating Expense', year].item()
-    interest_expense = income_statement.loc['Interest Expense', year].item()
-    total_expenses = cost_of_revenue + operating_expense + interest_expense
+        if isinstance(shares_outstanding, pd.Series):
+            shares_outstanding = shares_outstanding.iloc[0]
 
-    shares_outstanding = balance_sheet.loc['Ordinary Shares Number', year]
-    if isinstance(shares_outstanding, pd.Series):
-        shares_outstanding = shares_outstanding.iloc[0]
-
-    average_share_price = get_average_share_price(ticker, year)
-    market_cap = average_share_price * shares_outstanding
-    return total_revenue, cost_of_revenue, operating_expense, interest_expense, market_cap
+        average_share_price = get_average_share_price(ticker, year)
+        market_cap = average_share_price * shares_outstanding
+        return total_revenue, cost_of_revenue, operating_expense, interest_expense, market_cap
+    except KeyError as e:
+        print(f"Missing data for {ticker} in year {year}: {e}")
+        return None
 
 
 
@@ -78,9 +88,90 @@ def draw_scale(ax, revenue, cost_of_revenue, operating_expense, interest_expense
     tilt_angle_deg = (difference / max_value) * max_tilt_angle_deg
     tilt_angle = np.deg2rad(tilt_angle_deg) #convert to radians
 
+    # Function to rotate points by a given angle around the origin
+    def rotate_point(x, y, angle):
+        x_rotated = x * np.cos(angle) - y * np.sin(angle)
+        y_rotated = x * np.sin(angle) + y * np.cos(angle)
+        return x_rotated, y_rotated
 
-def animate_scale(ticker, years):
+    # Stacked rectangles for expenses
+    stack_x_position = right_plate_x + -1 #-1.5   Set the x coordinate slightly left of the expenses plate for stacking
+    current_height = support_height + 1.60  # Starting y-coordinate above the beam for stacking rectangles
+
+    # Rotate cost of revenue rectangle
+    current_height -= 2 * cost_of_revenue_scale
+    x0, y0 = rotate_point(stack_x_position, current_height, tilt_angle)
+    ax.add_patch(plt.Rectangle((x0, y0), 1, 2 * cost_of_revenue_scale, color='orange'))
+    ax.text(x0 + 0.5, y0 + cost_of_revenue_scale, f"Cost of Revenue: {cost_of_revenue}", ha='center', color='black')
+
+    # Rotate operating expense rectangle
+    current_height -= 2 * operating_expense_scale
+    x1, y1 = rotate_point(stack_x_position, current_height, tilt_angle)
+    ax.add_patch(plt.Rectangle((x1, y1), 1, 2 * operating_expense_scale, color='purple'))
+    ax.text(x1 + 0.5, y1 + operating_expense_scale, f"Operating Expense: {operating_expense}", ha='center',
+            color='black')
+
+    # Rotate interest expense rectangle
+    current_height -= 2 * interest_expense_scale
+    x2, y2 = rotate_point(stack_x_position, current_height, tilt_angle)
+    ax.add_patch(plt.Rectangle((x2, y2), 1, 2 * interest_expense_scale, color='green'))
+    ax.text(x2 + 0.5, y2 + interest_expense_scale, f"Interest Expense: {interest_expense}", ha='center', color='black')
+
+    # Rotate interest expense rectangle
+
+    # Set the position for Total Revenue
+    total_revenue_x_position = left_plate_x + .10  # This positions it on the left side of the scale
+    current_revenue_height = support_height + 2  # Starting height for Total Revenue
+
+    # Rotate total revenue rectangle
+    current_revenue_height -= 2 * revenue_scale  # Decrement height for proper stacking
+    x_total_revenue, y_total_revenue = rotate_point(total_revenue_x_position, current_revenue_height, tilt_angle)
+
+    # Add the Total Revenue rectangle to the plot
+    ax.add_patch(plt.Rectangle((x_total_revenue, y_total_revenue), 1, 2 * revenue_scale, color='blue'))
+    ax.text(x_total_revenue + 0.5, y_total_revenue + revenue_scale, f"Total Revenue: {revenue}", ha='center',
+            color='brown')
+    # Market Cap visual on the left side of the screen
+    market_cap_x_position = beam_length / 2 + 3 #setting the location of the market cap bar
+    market_cap_y_position = support_height - 9
+
+    # Market Cap changing value, everything involving a year
+    ax.add_patch(plt.Rectangle((market_cap_x_position, market_cap_y_position), 1, 2 * market_cap_scale, color='green'))
+    ax.text(market_cap_x_position + 0.5, market_cap_y_position + market_cap_scale, f"Market Cap: {market_cap}", ha='center',
+            color='black')
+
+
+
+    for line in ax.lines[-3:]: #selects the law three lines added, applies a rotation transformation to simulate the scale tilting toward the heavier side
+        x_data, y_data = line.get_data()
+        x_tilted = x_data * np.cos(tilt_angle) - y_data * np.sin(tilt_angle)
+        y_tilted = x_data * np.sin(tilt_angle) + y_data * np.cos(tilt_angle)
+        line.set_data(x_tilted, y_tilted)
+
+    ax.set_xlim(-10, 10)
+    ax.set_ylim(-5, 7)
+
+    ax.text(0, -3, "Company Performance: Revenue vs. Expenses", ha='center', fontsize=16, fontweight='bold')
+    ax.axis('off')
+    ax.text(0, support_height + 2, f"Market Cap: ${market_cap:,.0f}", ha='center', color='green', fontsize=12, fontweight='bold')
+
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/animate/<ticker>')
+def animate(ticker):
+    years = ['2020', '2021', '2022', '2023']
     financial_data = [load_data(ticker, year) for year in years]
+
+    # Filter out None values from financial_data
+    financial_data = [data for data in financial_data if data is not None]
+    # In your animate function
+
+    if not financial_data:
+        return jsonify({"error": "No financial data available for this ticker."}), 404
+
     fig, ax = plt.subplots(figsize=(25, 15))
 
     def update(frame):
@@ -90,30 +181,17 @@ def animate_scale(ticker, years):
         draw_scale(ax, total_revenue, cost_of_revenue, operating_expense, interest_expense, market_cap)
         ax.set_title(f"Financial Data for {year}")
 
-    ani = animation.FuncAnimation(fig, update, frames=len(years), repeat=True, interval=2000)
+    ani = animation.FuncAnimation(fig, update, frames=len(financial_data), repeat=True, interval=2000)
 
-    # Save as MP4
-    output_path = f'static/videos/{ticker}_animation.mp4'
-    ani.save(output_path, writer='ffmpeg', fps=30)
+    # Save as an MP4 file using the ffmpeg writer
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmpfile:
+        ani.save(tmpfile.name, writer='ffmpeg', fps=30)
+        plt.close(fig)
+        response = send_file(tmpfile.name, mimetype='video/mp4')
 
-    plt.close(fig)  # Close the figure after saving to free memory
-    return output_path
-
-
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    video_path = None
-    if request.method == 'POST':
-        ticker = request.form['ticker']
-        years = ['2020', '2021', '2022', '2023']  # You can also make this dynamic if needed
-        video_path = animate_scale(ticker, years)
-    return render_template('index.html', video_path=video_path)
-
-
-@app.route('/videos/<path:filename>')
-def send_video(filename):
-    return send_from_directory('static/videos', filename)
-
+    # Cleanup the temporary file after sending
+    os.remove(tmpfile.name)
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True)

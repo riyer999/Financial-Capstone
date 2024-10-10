@@ -4,7 +4,7 @@ import numpy as np
 import pickle
 import pandas as pd
 import yfinance as yf  # need all these libraries to run the code
-from matplotlib.animation import FFMpegWriter
+
 
 
 

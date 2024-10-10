@@ -3,22 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Animation</title>
+    <title>Financial Data Animation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px;
+        }
+        #result {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            display: none; /* Hide initially */
+        }
+        video {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 800px;
+            display: none; /* Hide initially */
+        }
+    </style>
 </head>
 <body>
-    <h1>Financial Scale Animation</h1>
-    <form method="POST">
-        <label for="ticker">Enter Stock Ticker:</label>
-        <input type="text" id="ticker" name="ticker" required>
-        <button type="submit">Generate Animation</button>
-    </form>
+    <h1>Financial Data Animation</h1>
+    <input type="text" id="ticker" placeholder="Enter Ticker (e.g., AAPL)">
+    <button id="fetchButton">Fetch Animation</button>
+    <div id="result"></div>
+    <video id="animation" controls>
+        <source id="videoSource" src="" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
 
-    {% if video_path %}
-        <h2>Generated Animation:</h2>
-        <video width="640" height="480" controls>
-            <source src="{{ video_path }}" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-    {% endif %}
+    <script>
+        document.getElementById('fetchButton').addEventListener('click', function () {
+            const ticker = document.getElementById('ticker').value;
+
+            fetch(`/animate/${ticker}`)
+                .then(response => {
+                    if (response.ok) {
+                        return response.blob();
+                    } else {
+                        return response.text().then(text => {
+                            throw new Error(text);
+                        });
+                    }
+                })
+                .then(videoBlob => {
+                    const videoElement = document.getElementById('animation');
+                    const videoSource = document.getElementById('videoSource');
+                    videoSource.src = URL.createObjectURL(videoBlob); // Create a URL for the video blob
+                    videoElement.style.display = 'block'; // Show the video
+                    videoElement.load(); // Load the new video
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                    document.getElementById('result').innerHTML = `<p>Error fetching data: ${error.message}</p>`;
+                    document.getElementById('result').style.display = 'block'; // Show result div
+                    document.getElementById('animation').style.display = 'none'; // Hide the video
+                });
+        });
+    </script>
 </body>
 </html>
