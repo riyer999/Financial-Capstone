@@ -1,72 +1,119 @@
-from flask import Flask, render_template, send_file #flask is the web framework used for making the web server
-import pickle #used to load serialized data. the data stored in allData.pkl
-import numpy as np
-import matplotlib
-matplotlib.use('Agg')  # Set to non-GUI backend
+from flask import Flask, render_template, request, send_from_directory
 import matplotlib.pyplot as plt
-import tempfile
+import matplotlib.animation as animation
+import numpy as np
+import pickle
+import pandas as pd
+import yfinance as yf
+import os
 
-app = Flask(__name__, template_folder='frontend/templates') #this argument specifies where flask will look for the html file to render. its looking for the html fles in the frontend/templates directory
-
-# Load data from the pickle file
-with open('backend/allData.pkl', 'rb') as file:  #opens the allData.pkl containing the financial information stored
-    allData = pickle.load(file) #reads in the pickle data from the allData.pkl
-
-# Define a route for the home page
-@app.route('/') #defines a route (URL) for the root of the web application.
-def home(): #logic that runs when the home route is accessed
-    return render_template('index.html') #returns and renders the index.html page
+app = Flask(__name__, template_folder='frontend/templates')
 
 
-# Define a route to serve the Operating Expenses data as a plot
-@app.route('/')
+
+def get_average_share_price(ticker, year):
+    start_date = f"{year}-01-01"
+    end_date = f"{year}-12-31"
+    stock_data = yf.Ticker(ticker)
+    historical_data = stock_data.history(start=start_date, end=end_date)
+    average_price = historical_data['Close'].mean()
+    return average_price
+
+
+def load_data(ticker, year):
+    with open('allData.pkl', 'rb') as file:
+        allData = pickle.load(file)
+
+    income_statement = allData[ticker]['income_statement']
+    balance_sheet = allData[ticker]['balance_sheet']
+
+    total_revenue = income_statement.loc['Total Revenue', year].item()
+    gross_profit = income_statement.loc['Gross Profit', year].item()
+    cost_of_revenue = total_revenue - gross_profit
+    operating_expense = income_statement.loc['Operating Expense', year].item()
+    interest_expense = income_statement.loc['Interest Expense', year].item()
+    total_expenses = cost_of_revenue + operating_expense + interest_expense
+
+    shares_outstanding = balance_sheet.loc['Ordinary Shares Number', year]
+    if isinstance(shares_outstanding, pd.Series):
+        shares_outstanding = shares_outstanding.iloc[0]
+
+    average_share_price = get_average_share_price(ticker, year)
+    market_cap = average_share_price * shares_outstanding
+    return total_revenue, cost_of_revenue, operating_expense, interest_expense, market_cap
+
+
+
+def draw_scale(ax, revenue, cost_of_revenue, operating_expense, interest_expense, market_cap): #drawing a scale taking in these parameters
+    base_width = 6
+    base_height = 1
+    beam_length = 12
+    support_height = 3
+
+    total_expenses = cost_of_revenue + operating_expense + interest_expense #what I am considering in the total expenses, not including some stuff like taxes
+    max_expense = max(total_expenses, revenue) #scaling everything to the max value
+    revenue_scale = revenue / max_expense
+    total_expense_scale = total_expenses / max_expense
+    cost_of_revenue_scale = cost_of_revenue / max_expense
+    operating_expense_scale = operating_expense / max_expense
+    interest_expense_scale = interest_expense / max_expense
+    market_cap_scale = market_cap / max_expense
+
+    ax.plot([-base_width / 2, base_width / 2], [0, 0], color='brown', lw=4) #base of the scale
+    ax.plot([0, 0], [0, support_height], color='black', lw=4) #vertical line from the base to support height
+    ax.plot([-beam_length / 2, beam_length / 2], [support_height, support_height], color='gray', lw=4) #horizontal beam on the support
+
+    left_plate_x = -beam_length / 2 #determines where to place the revenue plate at the end of the beam
+    ax.plot([left_plate_x, left_plate_x], [support_height, support_height - 2 * revenue_scale], color='blue', lw=4) #plots vertical line downward from the beam proportional to revenue_scale
+    ax.text(left_plate_x, support_height - 2.5 * revenue_scale, f"Revenue: {revenue}", ha='center', color='blue') #places text below the revenue plate to display the revenue amount
+
+    right_plate_x = beam_length / 2 #draws the right plate of the scale representing total expenses, scaled, and labeled total expenses
+    ax.plot([right_plate_x, right_plate_x], [support_height, support_height - 2 * total_expense_scale], color='red', lw=4) #plots vertical line downward proportinal to total_expense_scale
+    ax.text(right_plate_x, support_height - 2.5 * total_expense_scale, f"Total Expenses: {total_expenses}", ha='center', color='red') #places text label below the expense plate to display the total expenses amount
+
+    max_tilt_angle_deg = 20 #max possible tilt of the scale
+    difference = revenue - total_expenses #net difference between the revenue and expenes
+    max_value = max(revenue, total_expenses) #get the max value
+    # Calculate tilt angle in radians (already done earlier)
+    tilt_angle_deg = (difference / max_value) * max_tilt_angle_deg
+    tilt_angle = np.deg2rad(tilt_angle_deg) #convert to radians
+
+
+def animate_scale(ticker, years):
+    financial_data = [load_data(ticker, year) for year in years]
+    fig, ax = plt.subplots(figsize=(25, 15))
+
+    def update(frame):
+        year = years[frame]
+        total_revenue, cost_of_revenue, operating_expense, interest_expense, market_cap = financial_data[frame]
+        ax.clear()
+        draw_scale(ax, total_revenue, cost_of_revenue, operating_expense, interest_expense, market_cap)
+        ax.set_title(f"Financial Data for {year}")
+
+    ani = animation.FuncAnimation(fig, update, frames=len(years), repeat=True, interval=2000)
+
+    # Save as MP4
+    output_path = f'static/videos/{ticker}_animation.mp4'
+    ani.save(output_path, writer='ffmpeg', fps=30)
+
+    plt.close(fig)  # Close the figure after saving to free memory
+    return output_path
+
+
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html')
-
-# Route for the homePage.html page
-@app.route('/homePage')
-def homePage():
-    return render_template('homePage.html')
-
-#route for about us
-@app.route('/about')
-def aboutUsPage():
-    return render_template('aboutUsPage.html')
+    video_path = None
+    if request.method == 'POST':
+        ticker = request.form['ticker']
+        years = ['2020', '2021', '2022', '2023']  # You can also make this dynamic if needed
+        video_path = animate_scale(ticker, years)
+    return render_template('index.html', video_path=video_path)
 
 
+@app.route('/videos/<path:filename>')
+def send_video(filename):
+    return send_from_directory('static/videos', filename)
 
-@app.route('/data/<ticker>') #defining a route for a web application. the /data/ticker is the url for the localhost, the ticker can be replaced with only tickers in the make_allData file
-def get_data(ticker): #takes ticker as an argument. the value of the ticker will be passed to the url
-    if ticker in allData: #is the ticker in the allData library??
-        income_statement = allData[ticker]['income_statement'] #we just want income statement stuffs right now
-
-        if 'Operating Expense' in income_statement.index: #check the operating expenses entry present in the income statement
-            try: #catch potential errors
-                operating_expenses = income_statement.loc['Operating Expense'] # extractes the operating expenses from the income statement
-                cleaned_expenses = operating_expenses[operating_expenses != 0].dropna() #cleans the operating expenses by removing any entires that are zero and dropping the nan values
-                expenses_list = cleaned_expenses.values.tolist() #was getting a problem with zeroes being displayed
-                dates = cleaned_expenses.index.astype(str).tolist()
-
-                plt.figure(figsize=(10, 5)) #actual plotting part
-                plt.bar(dates, expenses_list, color='blue', width=0.4)
-                plt.title(f'Operating Expenses for {ticker}')
-                plt.xlabel('Dates')
-                plt.ylabel('Operating Expenses')
-                plt.xticks(rotation=45)
-                plt.tight_layout()
-
-                with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmpfile: #creating a temporary file to save the generated image.
-                    plt.savefig(tmpfile.name) #saves the current figure to a temp file created in the prevous line
-                    plt.close()  # Clear the figure to free up memory
-                    return send_file(tmpfile.name, mimetype='image/png') #Sends the image back to the client
-            except Exception as e:
-                return f'Error generating plot: {str(e)}', 500
-        else:
-            return f'Operating Expenses not found for ticker {ticker}.', 404
-    else:
-        return f'Ticker "{ticker}" not found in the data.', 404
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-

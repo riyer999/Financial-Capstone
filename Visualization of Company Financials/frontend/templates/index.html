@@ -1,80 +1,24 @@
-<!DOCTYPE html> <!-- declares the document as a HTML5 file -->
-<html lang="en"> <!-- language set to English -->
-<head>
-    <meta charset="UTF-8"> <!-- supporting all characters -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- responsive on all devices, width is eqwual on all the pages -->
-    <title>Financial Data Visualization</title> <!-- setting the title of the webpage -->
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        input[type="text"] {
-            padding: 10px;
-            margin-right: 10px;
-        }
-        button {
-            padding: 10px;
-        }
-        #result { /* showing the result area after the javascript function runs*/
-            margin-top: 20px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            display: none; /* hide initially */
-        }
-    </style>
-</head>
-<body>
-    <h1>Financial Data Fetcher</h1>
-    <input type="text" id="ticker" placeholder="Enter Ticker (e.g., AAPL)"> <!-- creating an area where you can enter the ticker symbol -->
-    <button id="fetchButton">Fetch Data</button>
-    <div id="result"></div> <!-- creates a div element that results when there are errors  -->
-    <img id="plot" style="display:none;" /> <!--  creates an image elemene to show a plot that will eventually be shown -->
-
-    <script> //this is where the javascript begins
-        document.getElementById('fetchButton').addEventListener('click', function() { <!-- clicker listener event that just waits for the clicker to be clicked and the rest will run -->
-            const ticker = document.getElementById('ticker').value; <!-- stores the input from the input field as a ticker variable -->
-
-            fetch(`/data/${ticker}`) //sending a request to the server for data on the ticker symbol
-                .then(response => { //handles the response from the fetch request
-                    if (response.ok) { //status code 200, gets the response then stores the binary object as a blob used for images
-                        return response.blob();  // get the image blob
-                    } else { //if there is no response, ie: spelled the ticker wrong or the ticker isn't in the allData.pkl file
-                        return response.text().then(text => { throw new Error(text); });  //error message
-                    }
-                })
-                .then(imageBlob => { //handling the blob image for when there is a 200 status code success
-                    const imgElement = document.getElementById('plot'); //get the image element by id to display the fetched image
-                    imgElement.src = URL.createObjectURL(imageBlob); // creates a URL for the image blob and sets it as the soruce so it can be displayed
-                    imgElement.style.display = 'block'; // show the image
-                    document.getElementById('result').innerHTML = ''; // clear previous results also allows you to update on screen what the new graph is
-                })
-                .catch(error => {
-                    document.getElementById('result').innerHTML = `<p>Error fetching data: ${error.message}</p>`; //error handling
-                    document.getElementById('result').style.display = 'block'; // Show result div
-                    console.error('Fetch error:', error);  // Log the error to console
-                });
-        });
-    </script>
-</body>
-</html>
-
-
-<!-- index.html url for the homepage -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Index Page</title>
+    <title>Financial Animation</title>
 </head>
 <body>
-<h1>Welcome to the Index Page</h1>
+    <h1>Financial Scale Animation</h1>
+    <form method="POST">
+        <label for="ticker">Enter Stock Ticker:</label>
+        <input type="text" id="ticker" name="ticker" required>
+        <button type="submit">Generate Animation</button>
+    </form>
 
-<nav>
-    <ul>
-        <li><a href="{{ url_for('homePage') }}">Go to Home Page</a></li>
-    </ul>
-</nav>
+    {% if video_path %}
+        <h2>Generated Animation:</h2>
+        <video width="640" height="480" controls>
+            <source src="{{ video_path }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    {% endif %}
 </body>
 </html>

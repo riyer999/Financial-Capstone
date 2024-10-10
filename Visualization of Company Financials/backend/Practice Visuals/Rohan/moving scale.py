@@ -4,6 +4,8 @@ import numpy as np
 import pickle
 import pandas as pd
 import yfinance as yf  # need all these libraries to run the code
+from matplotlib.animation import FFMpegWriter
+
 
 
 def get_average_share_price(ticker, year): #used to calculate the market cap over the past 3 years
@@ -114,10 +116,15 @@ def draw_scale(ax, revenue, cost_of_revenue, operating_expense, interest_expense
     # Add the Total Revenue rectangle to the plot
     ax.add_patch(plt.Rectangle((x_total_revenue, y_total_revenue), 1, 2 * revenue_scale, color='blue'))
     ax.text(x_total_revenue + 0.5, y_total_revenue + revenue_scale, f"Total Revenue: {revenue}", ha='center',
-            color='black')
+            color='brown')
+    # Market Cap visual on the left side of the screen
+    market_cap_x_position = beam_length / 2 + 3 #setting the location of the market cap bar
+    market_cap_y_position = support_height - 9
 
-    market_cap_x_position = beam_length / 2 + 3 #code not being used, from the market cap
-    market_cap_y_position = support_height - 9 #code not being used, used for the market cap visual
+    # Market Cap changing value, everything involving a year
+    ax.add_patch(plt.Rectangle((market_cap_x_position, market_cap_y_position), 1, 2 * market_cap_scale, color='green'))
+    ax.text(market_cap_x_position + 0.5, market_cap_y_position + market_cap_scale, f"Market Cap: {market_cap}", ha='center',
+            color='black')
 
 
 
@@ -139,7 +146,7 @@ def animate_scale(ticker, years): #animate the drawing of the financial scale ba
     financial_data = [load_data(ticker, year) for year in years] #iterate through each year in the years list and call load_date function for each year
     fig, ax = plt.subplots(figsize=(25, 15)) #new figure and axes and setting the size
 
-    def update(frame): #indexes the animation for the different years
+    def update(frame): #indexes the animation for the different years, dynamically updating the draw_scale function every time that you call this
         year = years[frame] #get the current year relative to the animation
         total_revenue, cost_of_revenue, operating_expense, interest_expense, market_cap = financial_data[frame] #unpacking financial metrics for the current year from financial_data baed on the frame index
         ax.clear()#clear the axis from any previous drawings
@@ -147,6 +154,7 @@ def animate_scale(ticker, years): #animate the drawing of the financial scale ba
         ax.set_title(f"Financial Data for {year}") #setting the title of the plot to indicate which years information you are looking at
 
     ani = animation.FuncAnimation(fig, update, frames=len(years), repeat=True, interval=2000) #fig used to animate, update to call each frame, frames is the toal number of frames length of the years list, delay is 2 seconds
+
     plt.show()
 
 
