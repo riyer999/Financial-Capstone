@@ -74,17 +74,17 @@ def draw_scale(ax, revenue, cost_of_revenue, operating_expense, interest_expense
     tilt_angle_deg = (difference / max_value) * max_tilt_angle_deg
     tilt_angle = np.deg2rad(tilt_angle_deg) #convert to radians
 
-    # Function to rotate points by a given angle around the origin
+
     def rotate_point(x, y, angle):
-        x_rotated = x * np.cos(angle) - y * np.sin(angle)
+        x_rotated = x * np.cos(angle) - y * np.sin(angle) #rotation functions
         y_rotated = x * np.sin(angle) + y * np.cos(angle)
         return x_rotated, y_rotated
 
-    # Stacked rectangles for expenses
+
     stack_x_position = right_plate_x + -1 #-1.5   Set the x coordinate slightly left of the expenses plate for stacking
     current_height = support_height + 1.60  # Starting y-coordinate above the beam for stacking rectangles
 
-    # Rotate cost of revenue rectangle
+
     current_height -= 2 * cost_of_revenue_scale
     x0, y0 = rotate_point(stack_x_position, current_height, tilt_angle)
     ax.add_patch(plt.Rectangle((x0, y0), 1, 2 * cost_of_revenue_scale, color='orange'))
@@ -117,7 +117,7 @@ def draw_scale(ax, revenue, cost_of_revenue, operating_expense, interest_expense
     ax.add_patch(plt.Rectangle((x_total_revenue, y_total_revenue), 1, 2 * revenue_scale, color='blue'))
     ax.text(x_total_revenue + 0.5, y_total_revenue + revenue_scale, f"Total Revenue: {revenue}", ha='center',
             color='brown')
-    # Market Cap visual on the left side of the screen
+
     market_cap_x_position = beam_length / 2 + 3 #setting the location of the market cap bar
     market_cap_y_position = support_height - 9
 
@@ -158,6 +158,6 @@ def animate_scale(ticker, years): #animate the drawing of the financial scale ba
     plt.show()
 
 
-ticker = 'AAPL' #the ticker that we want to see
+ticker = 'KO' #the ticker that we want to see
 years = ['2020', '2021', '2022', '2023'] #the list of years that we can get
 animate_scale(ticker, years)
