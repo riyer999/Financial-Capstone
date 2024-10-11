@@ -1,7 +1,8 @@
-import plotly.express as px # type: ignore
-import yfinance as yf # type: ignore
+import plotly.express as px
+import plotly.io as pio  # Import plotly.io for local display
+import yfinance as yf
 import pickle
-import pandas as pd # type: ignore
+import pandas as pd
 
 # Function to get the average share price for a specific year
 def get_average_share_price(ticker, year):
@@ -22,10 +23,32 @@ def load_data(ticker, year):
     income_statement = allData[ticker]['income_statement']
     balance_sheet = allData[ticker]['balance_sheet']
 
-    # Retrieve shares outstanding
-    shares_outstanding = balance_sheet.loc['Ordinary Shares Number', year]
-    if isinstance(shares_outstanding, pd.Series):
-        shares_outstanding = shares_outstanding.iloc[0]
+    # Function to find the label containing a keyword
+    def find_label(dataframe, keyword):
+        for label in dataframe.index:
+            if keyword.lower() in label.lower():
+                return label
+        raise KeyError(f"Label containing '{keyword}' not found in DataFrame index.")
+
+    # Retrieve labels dynamically
+    shares_label = find_label(balance_sheet, 'Ordinary Shares Number')
+    liabilities_label = find_label(balance_sheet, 'Total Liabilities')
+    assets_label = find_label(balance_sheet, 'Total Assets')
+    income_label = find_label(income_statement, 'Net Income')
+    revenue_label = find_label(income_statement, 'Total Revenue')
+
+    # Retrieve scalar values safely (handling Series if returned)
+    def get_scalar_value(df, label, year):
+        value = df.loc[label, year]
+        if isinstance(value, pd.Series):
+            value = value.iloc[0]  # Take the first value if a Series is returned
+        return value
+
+    shares_outstanding = get_scalar_value(balance_sheet, shares_label, year)
+    liabilities = get_scalar_value(balance_sheet, liabilities_label, year)
+    assets = get_scalar_value(balance_sheet, assets_label, year)
+    income = get_scalar_value(income_statement, income_label, year)
+    revenue = get_scalar_value(income_statement, revenue_label, year)
 
     # Get the average share price for the specific year
     average_share_price = get_average_share_price(ticker, year)
@@ -36,10 +59,10 @@ def load_data(ticker, year):
     return {
         'year': year,
         'market_cap': market_cap,
-        'income': income_statement.loc['Net Income', year],
-        'revenue': income_statement.loc['Total Revenue', year],
-        'assets': balance_sheet.loc['Total Assets', year],
-        'liabilities': balance_sheet.loc['Total Liabilities', year]
+        'income': income,
+        'revenue': revenue,
+        'assets': assets,
+        'liabilities': liabilities
     }
 
 # Define the company ticker
@@ -62,5 +85,5 @@ fig = px.sunburst(
     title="Sunburst of Financial Data by Year"
 )
 
-# Show the plot
-fig.show()
+# Show the plot in the current environment (e.g., Jupyter notebook, etc.)
+pio.show(fig)
