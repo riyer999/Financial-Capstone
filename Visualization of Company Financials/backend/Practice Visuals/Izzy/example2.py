@@ -1,89 +1,84 @@
-import plotly.express as px
-import plotly.io as pio  # Import plotly.io for local display
+import plotly.graph_objects as go
 import yfinance as yf
 import pickle
 import pandas as pd
 
-# Function to get the average share price for a specific year
-def get_average_share_price(ticker, year):
-    start_date = f"{year}-01-01"
-    end_date = f"{year}-12-31"
-    stock_data = yf.Ticker(ticker)
-    historical_data = stock_data.history(start=start_date, end=end_date)
-    average_price = historical_data['Close'].mean()
-    return average_price
+# Step 1: Load financial data (including balance sheet and income statement) from pickle file
+with open('../../allData.pkl', 'rb') as file:
+    allData = pickle.load(file)
 
-# Load financial data and calculate market cap using average share price
-def load_data(ticker, year):
-    # Load financial data from pickle file
-    with open('../../allData.pkl', 'rb') as file:
-        allData = pickle.load(file)
+# Select the company ticker (e.g., 'KO')
+ticker = 'KO'
 
-    # Extract income statement and balance sheet for the company
-    income_statement = allData[ticker]['income_statement']
+# Step 2: Get financial data for the selected ticker
+if ticker in allData:
     balance_sheet = allData[ticker]['balance_sheet']
+    income_statement = allData[ticker]['income_statement']
 
-    # Function to find the label containing a keyword
-    def find_label(dataframe, keyword):
-        for label in dataframe.index:
-            if keyword.lower() in label.lower():
-                return label
-        raise KeyError(f"Label containing '{keyword}' not found in DataFrame index.")
+    # Extract Shares Outstanding (typically in the Equity section, labeled as 'Ordinary Shares Number')
+    shares_outstanding = balance_sheet.loc['Ordinary Shares Number', :].values[0]  # Adjust if labeled differently
 
-    # Retrieve labels dynamically
-    shares_label = find_label(balance_sheet, 'Ordinary Shares Number')
-    liabilities_label = find_label(balance_sheet, 'Total Liabilities')
-    assets_label = find_label(balance_sheet, 'Total Assets')
-    income_label = find_label(income_statement, 'Net Income')
-    revenue_label = find_label(income_statement, 'Total Revenue')
+    # Extract Total Revenue and Total Expenses (e.g., Operating Expense)
+    total_revenue = income_statement.loc['Total Revenue']
+    gross_profit = income_statement.loc['Gross Profit']
+    cost_of_revenue = total_revenue - gross_profit
+    operating_expense = income_statement.loc['Operating Expense']
+    interest_expense = income_statement.loc['Interest Expense']
+    total_expenses = operating_expense + cost_of_revenue + interest_expense
+else:
+    raise ValueError(f"Ticker {ticker} not found in the data.")
 
-    # Retrieve scalar values safely (handling Series if returned)
-    def get_scalar_value(df, label, year):
-        value = df.loc[label, year]
-        if isinstance(value, pd.Series):
-            value = value.iloc[0]  # Take the first value if a Series is returned
-        return value
+# Step 3: Get the current stock price using yfinance
+stock_data = yf.Ticker(ticker)
+share_price = stock_data.history(period='1d')['Close'][0]  # Get the latest closing price
 
-    shares_outstanding = get_scalar_value(balance_sheet, shares_label, year)
-    liabilities = get_scalar_value(balance_sheet, liabilities_label, year)
-    assets = get_scalar_value(balance_sheet, assets_label, year)
-    income = get_scalar_value(income_statement, income_label, year)
-    revenue = get_scalar_value(income_statement, revenue_label, year)
+# Step 4: Calculate Market Cap
+market_cap = share_price * shares_outstanding
 
-    # Get the average share price for the specific year
-    average_share_price = get_average_share_price(ticker, year)
+# Example periods for the slider (e.g., '2020', '2021', '2022', '2023')
+periods = ['2020', '2021', '2022', '2023']  # Add more periods as per your dataset
 
-    # Calculate market cap
-    market_cap = average_share_price * shares_outstanding
+# Dummy data for each period (replace with actual calculations for each year/period)
+revenue_data = [total_revenue.values[0], total_revenue.values[0] * 1.05, total_revenue.values[0] * 1.1, total_revenue.values[0] * 1.15]
+expense_data = [total_expenses.values[0], total_expenses.values[0] * 1.03, total_expenses.values[0] * 1.07, total_expenses.values[0] * 1.12]
+market_cap_data = [market_cap, market_cap * 1.02, market_cap * 1.08, market_cap * 1.15]
 
-    return {
-        'year': year,
-        'market_cap': market_cap,
-        'income': income,
-        'revenue': revenue,
-        'assets': assets,
-        'liabilities': liabilities
-    }
+# Step 5: Create the bar chart with a slider
+fig = go.Figure()
 
-# Define the company ticker
-ticker = 'AAPL'  # Replace 'AAPL' with your desired ticker
+# Add a single set of bars (these will update with the slider)
+fig.add_trace(go.Bar(
+    x=['Revenue', 'Expenses', 'Market Cap'],
+    y=[revenue_data[0], expense_data[0], market_cap_data[0]],  # Initial values for the first period
+    marker_color=['green', 'red', 'blue']
+))
 
-# Retrieve financial data for specific years
-years = ['2020', '2021', '2022', '2023']
-financial_data = [load_data(ticker, year) for year in years]
+# Step 6: Create slider steps that update the y-values of the bars
+steps = []
+for i, period in enumerate(periods):
+    step = dict(
+        method="restyle",  # Update the bars' y-values
+        args=[{"y": [[revenue_data[i], expense_data[i], market_cap_data[i]]]}],
+        label=period
+    )
+    steps.append(step)
 
-# Create a dataframe from the financial data
-df = pd.DataFrame(financial_data)
+# Step 7: Add the slider to the layout
+sliders = [dict(
+    active=0,
+    currentvalue={"prefix": "Period: "},
+    pad={"t": 50},
+    steps=steps
+)]
 
-# Create a sunburst plot
-fig = px.sunburst(
-    df,
-    path=['year', 'income', 'revenue', 'assets', 'liabilities'],
-    values='market_cap',  # The value used to determine the size of the segments
-    color='market_cap',  # The value used to color the segments
-    color_continuous_scale='Viridis',
-    title="Sunburst of Financial Data by Year"
+# Step 8: Update layout
+fig.update_layout(
+    sliders=sliders,
+    title=f"{ticker} Financial Data: Revenue, Expenses, Market Cap",
+    yaxis_title="Value in $",
+    xaxis_title="Categories",
+    barmode='group'
 )
 
-# Show the plot in the current environment (e.g., Jupyter notebook, etc.)
-pio.show(fig)
+# Step 9: Display the plot
+fig.show()
