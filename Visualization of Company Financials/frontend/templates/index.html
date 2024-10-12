@@ -3,70 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Data Animation</title>
+    <title>Financial Data Visualization</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            text-align: center;
+            margin-bottom: 20px;
         }
         input[type="text"] {
             padding: 10px;
-            margin-right: 10px;
-        }
-        button {
-            padding: 10px;
-        }
-        #result {
-            margin-top: 20px;
+            width: 200px;
             border: 1px solid #ccc;
-            padding: 10px;
-            display: none; /* Hide initially */
+            border-radius: 4px;
+        }
+        input[type="submit"] {
+            padding: 10px 15px;
+            background-color: #5cb85c;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #4cae4c;
         }
         video {
-            margin-top: 20px;
-            width: 100%;
-            max-width: 800px;
-            display: none; /* Hide initially */
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
         }
     </style>
 </head>
 <body>
-    <h1>Financial Data Animation</h1>
-    <input type="text" id="ticker" placeholder="Enter Ticker (e.g., AAPL)">
-    <button id="fetchButton">Fetch Animation</button>
-    <div id="result"></div>
-    <video id="animation" controls>
-        <source id="videoSource" src="" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
+    <h1>Financial Data Visualization</h1>
+    <form id="ticker-form">
+        <input type="text" id="ticker" placeholder="Enter Ticker Symbol" required>
+        <input type="submit" value="Visualize">
+    </form>
+    <video id="video" controls></video>
 
     <script>
-        document.getElementById('fetchButton').addEventListener('click', function () {
+        document.getElementById('ticker-form').addEventListener('submit', function (event) {
+            event.preventDefault();
             const ticker = document.getElementById('ticker').value;
-
-            fetch(`/animate/${ticker}`)
-                .then(response => {
-                    if (response.ok) {
-                        return response.blob();
-                    } else {
-                        return response.text().then(text => {
-                            throw new Error(text);
-                        });
-                    }
-                })
-                .then(videoBlob => {
-                    const videoElement = document.getElementById('animation');
-                    const videoSource = document.getElementById('videoSource');
-                    videoSource.src = URL.createObjectURL(videoBlob); // Create a URL for the video blob
-                    videoElement.style.display = 'block'; // Show the video
-                    videoElement.load(); // Load the new video
-                })
-                .catch(error => {
-                    console.error('Fetch error:', error);
-                    document.getElementById('result').innerHTML = `<p>Error fetching data: ${error.message}</p>`;
-                    document.getElementById('result').style.display = 'block'; // Show result div
-                    document.getElementById('animation').style.display = 'none'; // Hide the video
-                });
+            const video = document.getElementById('video');
+            video.src = `/data/${ticker}`;
+            video.load();
+            video.play();
         });
     </script>
 </body>

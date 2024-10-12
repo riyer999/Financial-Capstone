@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
+import matplotlib
+from matplotlib.animation import FuncAnimation
+from matplotlib import animation
 import numpy as np
 import pickle
 import pandas as pd
@@ -142,20 +144,27 @@ def draw_scale(ax, revenue, cost_of_revenue, operating_expense, interest_expense
     ax.text(0, support_height + 2, f"Market Cap: ${market_cap:,.0f}", ha='center', color='green', fontsize=12, fontweight='bold')
 
 
-def animate_scale(ticker, years): #animate the drawing of the financial scale based on the ticker and the years
-    financial_data = [load_data(ticker, year) for year in years] #iterate through each year in the years list and call load_date function for each year
-    fig, ax = plt.subplots(figsize=(25, 15)) #new figure and axes and setting the size
+def animate_scale(ticker, years):  # animate the drawing of the financial scale based on the ticker and the years
+    financial_data = [load_data(ticker, year) for year in years]  # iterate through each year in the years list and call load_data function for each year
+    fig, ax = plt.subplots(figsize=(25, 15))  # new figure and axes and setting the size
 
-    def update(frame): #indexes the animation for the different years, dynamically updating the draw_scale function every time that you call this
-        year = years[frame] #get the current year relative to the animation
-        total_revenue, cost_of_revenue, operating_expense, interest_expense, market_cap = financial_data[frame] #unpacking financial metrics for the current year from financial_data baed on the frame index
-        ax.clear()#clear the axis from any previous drawings
-        draw_scale(ax, total_revenue, cost_of_revenue, operating_expense, interest_expense, market_cap) #redraw the scale on the axis
-        ax.set_title(f"Financial Data for {year}") #setting the title of the plot to indicate which years information you are looking at
+    def update(frame):  # indexes the animation for the different years, dynamically updating the draw_scale function every time that you call this
+        year = years[frame]  # get the current year relative to the animation
+        total_revenue, cost_of_revenue, operating_expense, interest_expense, market_cap = financial_data[frame]  # unpacking financial metrics for the current year from financial_data based on the frame index
+        ax.clear()  # clear the axis from any previous drawings
+        draw_scale(ax, total_revenue, cost_of_revenue, operating_expense, interest_expense, market_cap)  # redraw the scale on the axis
+        ax.set_title(f"Financial Data for {year}")  # setting the title of the plot to indicate which year's information you are looking at
 
-    ani = animation.FuncAnimation(fig, update, frames=len(years), repeat=True, interval=2000) #fig used to animate, update to call each frame, frames is the toal number of frames length of the years list, delay is 2 seconds
+    anim = animation.FuncAnimation(fig, update, frames=len(years), repeat=True, interval=2000)  # fig used to animate, update to call each frame, frames is the total number of frames length of the years list, delay is 2 seconds
+    # fig used to animate, update to call each frame, frames is the total number of frames length of the years list, delay is 2 seconds
+    matplotlib.rcParams['animation.ffmpeg_path'] = "C:\\Users\\RIyer\\Downloads\\ffmpeg-7.1-essentials_build\\ffmpeg-7.1-essentials_build\\bin\\ffmpeg.exe"
+    writer = animation.FFMpegWriter(fps=1, metadata=dict(artist="Rohan"), bitrate=1800)
+    plt.show()  # Show the plot
+    anim.save('Moving Scale.mp4', writer)
 
-    plt.show()
+
+    plt.show()  # Show the plot
+
 
 
 ticker = 'KO' #the ticker that we want to see
